@@ -35,12 +35,15 @@
             this.directionlbl = new System.Windows.Forms.Label();
             this.directioncmb = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.stopcmb = new System.Windows.Forms.ComboBox();
+            this.stopIDtxt = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // selectRoutelbl
             // 
             this.selectRoutelbl.AutoSize = true;
+            this.selectRoutelbl.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.selectRoutelbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.selectRoutelbl.ForeColor = System.Drawing.SystemColors.Info;
             this.selectRoutelbl.Location = new System.Drawing.Point(48, 9);
             this.selectRoutelbl.Name = "selectRoutelbl";
             this.selectRoutelbl.Size = new System.Drawing.Size(90, 13);
@@ -72,15 +75,19 @@
             // resulttxt
             // 
             this.resulttxt.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.resulttxt.Location = new System.Drawing.Point(193, 12);
+            this.resulttxt.Location = new System.Drawing.Point(191, 12);
             this.resulttxt.Multiline = true;
             this.resulttxt.Name = "resulttxt";
-            this.resulttxt.Size = new System.Drawing.Size(364, 34);
+            this.resulttxt.ReadOnly = true;
+            this.resulttxt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.resulttxt.Size = new System.Drawing.Size(284, 193);
             this.resulttxt.TabIndex = 7;
             // 
             // directionlbl
             // 
             this.directionlbl.AutoSize = true;
+            this.directionlbl.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.directionlbl.ForeColor = System.Drawing.SystemColors.Info;
             this.directionlbl.Location = new System.Drawing.Point(48, 67);
             this.directionlbl.Name = "directionlbl";
             this.directionlbl.Size = new System.Drawing.Size(82, 13);
@@ -101,31 +108,30 @@
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.label1.ForeColor = System.Drawing.SystemColors.Info;
             this.label1.Location = new System.Drawing.Point(48, 123);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(62, 13);
+            this.label1.Size = new System.Drawing.Size(80, 13);
             this.label1.TabIndex = 4;
-            this.label1.Text = "Select Stop";
+            this.label1.Text = "Input Stop ID #";
             // 
-            // stopcmb
+            // stopIDtxt
             // 
-            this.stopcmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.stopcmb.DropDownWidth = 350;
-            this.stopcmb.Enabled = false;
-            this.stopcmb.FormattingEnabled = true;
-            this.stopcmb.Location = new System.Drawing.Point(13, 139);
-            this.stopcmb.Name = "stopcmb";
-            this.stopcmb.Size = new System.Drawing.Size(161, 21);
-            this.stopcmb.TabIndex = 5;
-            this.stopcmb.SelectionChangeCommitted += new System.EventHandler(this.stopcmb_SelectionChangeCommitted);
+            this.stopIDtxt.Enabled = false;
+            this.stopIDtxt.Location = new System.Drawing.Point(12, 139);
+            this.stopIDtxt.MaxLength = 5;
+            this.stopIDtxt.Name = "stopIDtxt";
+            this.stopIDtxt.Size = new System.Drawing.Size(162, 20);
+            this.stopIDtxt.TabIndex = 5;
             // 
             // mainfrm
             // 
             this.AcceptButton = this.showTimesbtn;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(569, 217);
-            this.Controls.Add(this.stopcmb);
+            this.ClientSize = new System.Drawing.Size(487, 217);
+            this.Controls.Add(this.stopIDtxt);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.directioncmb);
             this.Controls.Add(this.directionlbl);
@@ -134,7 +140,8 @@
             this.Controls.Add(this.showTimesbtn);
             this.Controls.Add(this.selectRoutelbl);
             this.Name = "mainfrm";
-            this.Text = "Bus Stop Guide";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "BuStop Guide";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -149,7 +156,7 @@
         private System.Windows.Forms.Label directionlbl;
         private System.Windows.Forms.ComboBox directioncmb;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox stopcmb;
+        private System.Windows.Forms.TextBox stopIDtxt;
     }
 }
 

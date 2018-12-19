@@ -14,9 +14,8 @@ namespace Bus_Stop_Guide
     {
         //variables to hold route and direction
         string ROUTE = "";
-        string DIRECTION = "";
         string DIRECTION_CODE = "";
-        string STOPID = "";
+        string DIRECTION = "";
 
         //list of urls to make requests
         private string formatLine = "?format=json";
@@ -30,6 +29,10 @@ namespace Bus_Stop_Guide
 
         public mainfrm()
         {
+            //setting background image
+            this.BackgroundImage = Properties.Resources.Capture;
+            this.Icon = Properties.Resources.Bus_Stop;
+
             InitializeComponent();
 
             //get bus routes and popluate the busRoutecmb
@@ -83,10 +86,10 @@ namespace Bus_Stop_Guide
 
             //looking at which directions the route goes and populating directioncmb
             List<string> directions = new List<string>();
-            if(response.Contains("1") == true){ directions.Add("South"); }
-            if(response.Contains("2") == true){ directions.Add("East"); }
-            if(response.Contains("3") == true){ directions.Add("West"); }
-            if(response.Contains("4") == true){ directions.Add("North"); }
+            if(response.Contains("1") == true){ directions.Add("Southbound"); }
+            if(response.Contains("2") == true){ directions.Add("Eastbound"); }
+            if(response.Contains("3") == true){ directions.Add("Westbound"); }
+            if(response.Contains("4") == true){ directions.Add("Northbound"); }
             //adding the found directions to the combobox
             directioncmb.DataSource = directions;
         }
@@ -94,18 +97,19 @@ namespace Bus_Stop_Guide
         //method to control what happens after the user selects the bus route direction
         private void directioncmb_SelectionChangeCommitted(object sender, EventArgs e)
         {
-            //enable stopcmb
-            stopcmb.Enabled = true;
+            //enable stopIDtxt and showTimesbtn
+            stopIDtxt.Enabled = true;
+            showTimesbtn.Enabled = true;
 
             //variables to hold the route and direction
             ROUTE = busRoutecmb.GetItemText(busRoutecmb.SelectedItem);
             DIRECTION = directioncmb.GetItemText(directioncmb.SelectedItem);
 
             //get directions code
-            if (DIRECTION == "South") { DIRECTION_CODE = "1"; }
-            if (DIRECTION == "East") { DIRECTION_CODE = "2"; }
-            if (DIRECTION == "West") { DIRECTION_CODE = "3"; }
-            if (DIRECTION == "North") { DIRECTION_CODE = "4"; }
+            if (DIRECTION == "Southbound") { DIRECTION_CODE = "1"; }
+            if (DIRECTION == "Eastbound") { DIRECTION_CODE = "2"; }
+            if (DIRECTION == "Westbound") { DIRECTION_CODE = "3"; }
+            if (DIRECTION == "Northbound") { DIRECTION_CODE = "4"; }
             //request the information
             restClient.endPoint = stopsUrl + ROUTE + "/" + DIRECTION_CODE + formatLine;
             string response = restClient.request();
@@ -123,18 +127,18 @@ namespace Bus_Stop_Guide
                 stop = stop.Trim('{');
                 stop = stop.Replace("\"Text\":\"", "");
                 stop = stop.Replace("\"", " ");
-                stop = stop.Replace("Value", "Stop ID");
+                stop = stop.Replace("Value", "");
+                stop = stop.Replace(",", "");
+                stop = stop.Replace(":", "");
                 //add formatted elements to the List
                 stops.Add(stop);
-
+                resulttxt.AppendText(stop + "\n");
             }
-
-            stopcmb.DataSource = stops;
             
         }
 
         //method to control what happens after the user selects their stop
-        private void stopcmb_SelectionChangeCommitted(object sender, EventArgs e)
+        /*private void stopcmb_SelectionChangeCommitted(object sender, EventArgs e)
         {
             //enable the Show Times button
             showTimesbtn.Enabled = true;
@@ -146,21 +150,93 @@ namespace Bus_Stop_Guide
             string[] stopData = stopString.Split(',');
             stopData[1] = stopData[1].Replace(" Stop ID : ", "");
             STOPID = stopData[1];
-        }
+        }*/
 
         //method to control what happens when you press the show times button
         private void showTimesbtn_Click(object sender, EventArgs e)
         {
-            //clear text box
-            resulttxt.Clear();
+            //get user input and validate it
+            string userInput = stopIDtxt.Text;
+            //check to make sure user input is not empty
+            bool notNull = false;
+            bool isDigits = false;
+            if (string.IsNullOrEmpty(userInput) == true || userInput.Length < 5) {
+                MessageBox.Show("You must enter a five digit stop ID to be able to show a time for it.", "Input Error");
+                stopIDtxt.Focus();
+            }
+            else {
+                notNull = true;
+                //check that all the characters entered are digits
+                int output = 0;
+                bool result = int.TryParse(userInput, out output);
+                if (result == true)
+                {
+                    isDigits = true;
+                }
+                else
+                {
+                    MessageBox.Show("You must only enter numeric digits", "Input Error");
+                    stopIDtxt.Focus();
+                }
+            }
+            
+            //check to make sure all conditions met
+            if (notNull == true && isDigits == true)
+            {
+                //I tested this using route 2 going Eastbound and entering the stop ID 13223 in the textbox
 
-            //making request for the departure time of requested stop
-            Console.WriteLine(ROUTE + " " + DIRECTION_CODE + " " + STOPID);
-            restClient.endPoint = departTimeUrl + ROUTE + "/" + DIRECTION_CODE + "/" + STOPID + formatLine;
-            string response = restClient.request();
-            //show what was returned on console
-            Console.WriteLine(response);
+                //making request for the departure time of requested stop
+                Console.WriteLine(ROUTE + " " + DIRECTION_CODE + " " + userInput);
+                //restClient.endPoint = departTimeUrl + ROUTE + "/" + DIRECTION_CODE + "/" + userInput + formatLine;
+                restClient.endPoint = departTimeUrl + userInput + formatLine;
+                string response = restClient.request();
+                //show what was returned on console
+                Console.WriteLine(response);
 
+                //checking that a response was recieved
+                if (response == "[]" || response == "")
+                {
+                    MessageBox.Show("That is not a valid stop ID.", "Input Error");
+                    stopIDtxt.Focus();
+                }
+                else
+                {
+                    //clear text box
+                    resulttxt.Clear();
+
+                    //extract relevent text from response
+                    string[] departures = response.Split('}');
+                    List<string> times = new List<string>();
+                    resulttxt.Text = "Next Departure: ";
+                    foreach (string departure in departures)
+                    {
+                        
+                        if (departure.Contains("Route\":\"" + ROUTE + "\"") == true
+                            && departure.Contains(DIRECTION.ToUpper()) == true)
+                        {
+                            Console.WriteLine("departure = " + departure);
+
+
+                            //extracting departure times from the response
+                            string[] departTimes = departure.Split(',');
+                            foreach (string element in departTimes)
+                            {
+                                if (element.Contains("DepartureText") == true)
+                                {
+                                    element.Trim(',');
+                                    string time = element.Replace("\"", "");
+                                    time = time.Replace("DepartureText", "");
+                                    time = time.Trim(':');
+
+                                    //add response to resulttxt
+                                    resulttxt.AppendText(time + "\n");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
 
     }
